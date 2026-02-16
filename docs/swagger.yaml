@@ -1,0 +1,316 @@
+basePath: /api
+definitions:
+  myerrors.ErrorInternalServerError:
+    properties:
+      error:
+        example: internal server error
+        type: string
+    type: object
+  myerrors.ErrorNotFound:
+    properties:
+      error:
+        example: subscription not found
+        type: string
+    type: object
+  myerrors.ErrorResponse:
+    properties:
+      error:
+        example: invalid id format
+        type: string
+    type: object
+  v1.ListSubscriptionsResponseDto:
+    properties:
+      paging:
+        $ref: '#/definitions/v1.Paging'
+      rows:
+        items:
+          $ref: '#/definitions/v1.SubscriptionResponseDTO'
+        type: array
+      total_sum:
+        example: 15900
+        type: integer
+    type: object
+  v1.Paging:
+    properties:
+      limit:
+        example: 10
+        type: integer
+      offset:
+        example: 5
+        type: integer
+      total:
+        example: 42
+        type: integer
+    type: object
+  v1.SubscriptionDTO:
+    properties:
+      end_date:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  v1.SubscriptionID:
+    properties:
+      id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+    type: object
+  v1.SubscriptionResponseDTO:
+    properties:
+      end_date:
+        example: 08-2026
+        type: string
+      id:
+        example: 123e4567-e89b-12d3-a456-426614174000
+        type: string
+      price:
+        example: 99900
+        type: integer
+      service_name:
+        example: Netflix
+        type: string
+      start_date:
+        example: 07-2026
+        type: string
+      user_id:
+        example: 987f6543-e21b-34d5-c678-426614174999
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: API для управления подписками
+  title: Subscription API
+  version: "1.0"
+paths:
+  /subscriptions:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список подписок с пагинацией
+      parameters:
+      - description: Количество элементов
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: Смещение
+        in: query
+        name: offset
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список подписок
+          schema:
+            items:
+              $ref: '#/definitions/v1.SubscriptionResponseDTO'
+            type: array
+        "400":
+          description: Некорректный ID
+          schema:
+            $ref: '#/definitions/myerrors.ErrorResponse'
+        "404":
+          description: Подписка не найдена
+          schema:
+            $ref: '#/definitions/myerrors.ErrorNotFound'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/myerrors.ErrorInternalServerError'
+      summary: Получить список подписок
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новую подписку и возвращает её идентификатор
+      parameters:
+      - description: Данные для создания подписки
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SubscriptionDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Подписка успешно создана
+          schema:
+            $ref: '#/definitions/v1.SubscriptionID'
+        "400":
+          description: Некорректные данные
+          schema:
+            $ref: '#/definitions/myerrors.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/myerrors.ErrorInternalServerError'
+      summary: Создать подписку
+      tags:
+      - subscriptions
+  /subscriptions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет подписку по её идентификатору
+      parameters:
+      - description: ID подписки
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Подписка успешно удалена
+        "400":
+          description: Некорректный ID
+          schema:
+            $ref: '#/definitions/myerrors.ErrorResponse'
+        "404":
+          description: Подписка не найдена
+          schema:
+            $ref: '#/definitions/myerrors.ErrorNotFound'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/myerrors.ErrorInternalServerError'
+      summary: Удалить подписку
+      tags:
+      - subscriptions
+    get:
+      consumes:
+      - application/json
+      description: Возвращает подписку по её идентификатору
+      parameters:
+      - description: ID подписки
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Подписка найдена
+          schema:
+            $ref: '#/definitions/v1.SubscriptionResponseDTO'
+        "400":
+          description: Некорректный ID
+          schema:
+            $ref: '#/definitions/myerrors.ErrorResponse'
+        "404":
+          description: Подписка не найдена
+          schema:
+            $ref: '#/definitions/myerrors.ErrorNotFound'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/myerrors.ErrorInternalServerError'
+      summary: Получить подписку по ID
+      tags:
+      - subscriptions
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные подписки по ID
+      parameters:
+      - description: ID подписки
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Данные для обновления подписки
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SubscriptionDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Подписка успешно обновлена
+          schema:
+            $ref: '#/definitions/v1.SubscriptionID'
+        "400":
+          description: Некорректные данные
+          schema:
+            $ref: '#/definitions/myerrors.ErrorResponse'
+        "404":
+          description: Подписка не найдена
+          schema:
+            $ref: '#/definitions/myerrors.ErrorNotFound'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/myerrors.ErrorInternalServerError'
+      summary: Обновить подписку
+      tags:
+      - subscriptions
+  /subscriptions/sum:
+    get:
+      description: Возвращает суммарную стоимость всех подписок пользователя
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Service name
+        in: query
+        name: service_name
+        type: string
+      - description: Start date (MM-YYYY)
+        in: query
+        name: start
+        type: string
+      - description: End date (MM-YYYY)
+        in: query
+        name: end
+        type: string
+      - default: 10
+        description: Limit subscriptions for count price
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset subscriptions
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ListSubscriptionsResponseDto'
+        "400":
+          description: Некорректный ID
+          schema:
+            $ref: '#/definitions/myerrors.ErrorResponse'
+        "404":
+          description: Подписка не найдена
+          schema:
+            $ref: '#/definitions/myerrors.ErrorNotFound'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/myerrors.ErrorInternalServerError'
+      summary: Получить сумму стоимости подписок
+      tags:
+      - subscriptions
+schemes:
+- http
+swagger: "2.0"

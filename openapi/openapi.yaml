@@ -1,0 +1,400 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Testing task (SUBSCRIPTION)
+paths:
+  /subscriptions:
+    post:
+      summary: Create subscription
+      operationId: Create
+      tags:
+        - subscriptions
+      requestBody:
+        description: Subscription data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionRequest'
+      responses:
+        '201':
+          description: Created subscription
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400': 
+          description: Invalid input data 
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '500': 
+          description: Internal server error 
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: List subscriptions
+      operationId: List
+      tags:
+        - subscriptions
+      parameters:
+        - name: limit
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 10
+          description: Limit subscription items
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 5
+          description: Offset subscription items
+      responses:
+        '200':
+          description: List subscription items successfully got
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paging:
+                    $ref: '#/components/schemas/Paging'
+                  rows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+        '400': 
+          description: Invalid query parameters 
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '404': 
+          description: Subscription not found
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '500': 
+          description: Internal server error 
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /subscriptions/sum:
+    get:
+      summary: List subscriptions with sum prices and filters
+      operationId: Sum
+      tags:
+        - subscriptions
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+        - in: query
+          name: service_name
+          schema:
+            type: string
+          description: Service name
+        - in: query
+          name: start
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])-[0-9]{4}$'
+          description: Start date
+        - in: query
+          name: end
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])-[0-9]{4}$'
+          description: End date
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Limit subscriptions for count price
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Offset subscriptions
+      responses:
+        '200':
+          description: Filtered list of subscriptions with price
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - paging
+                  - total_sum
+                  - rows
+                properties:
+                  paging:
+                    $ref: '#/components/schemas/Paging'
+                  total_sum:
+                    type: integer
+                    example: 12345
+                  rows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+        '400': 
+          description: Invalid filter parameters
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '404': 
+          description: Subscription not found
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '500': 
+          description: Internal server error 
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /subscriptions/{id}:
+    get:
+      summary: Get subscription by id
+      operationId: Get
+      tags:
+        - subscriptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Subscription ID
+      responses:
+        '200':
+          description: Subscription By ID found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400': 
+          description: Invalid ID format
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '404': 
+          description: Subscription not found
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '500': 
+          description: Internal server error 
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update subscription by id
+      operationId: Update
+      tags:
+        - subscriptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Subscription ID
+      requestBody:
+        description: Subscription data for update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionRequest'
+      responses:
+        '200':
+          description: Updated subscription successfull
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400': 
+          description: Invalid input data
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '404': 
+          description: Subscription not found
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '500': 
+          description: Internal server error 
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: DeleteSubscription By ID
+      operationId: Delete
+      tags:
+        - subscriptions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Subscription ID
+      responses:
+        "204":
+          description: "Successfully deleted"
+        '404': 
+          description: Subscription not found
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '400': 
+          description: Invalid ID format
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse' 
+        '500': 
+          description: Internal server error 
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: "invalid id format"
+
+
+    Paging:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 10
+          description: Count of subscriptions
+        offset:
+          type: integer
+          example: 0
+          description: Offset number
+        limit:
+          type: integer
+          example: 10
+          description: Limit items
+
+
+    Subscription:
+      type: object
+      required:
+        - id
+        - service_name
+        - price
+        - user_id
+        - start_date
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+          description: ID подписки
+        service_name:
+          type: string
+          example: Yandex Plus
+          description: Название сервиса, предоставляющего подписку
+        price:
+          type: integer
+          example: 400
+          description: "Стоимость месячной подписки в рублях"
+        user_id:
+          type: string
+          format: uuid
+          example: "60601fee-2bf1-4721-a76f-7636e79a0cba"
+          description: ID пользователя
+        start_date:
+          type: string
+          pattern: '^(0[1-9]|1[0-2])-[0-9]{4}$'
+          example: "07-2025"
+          description: Дата начала подписки (месяц и год)
+        end_date:
+          type: string
+          nullable: true
+          pattern: '^(0[1-9]|1[0-2])-[0-9]{4}$'
+          example: "08-2025"
+          description: Дата окончания подписки (опционально)
+
+    SubscriptionRequest:
+      type: object
+      required:
+        - service_name
+        - price
+        - user_id
+        - start_date
+      properties:
+        service_name:
+          type: string
+          example: Yandex Plus
+          description: Название сервиса, предоставляющего подписку
+        price:
+          type: integer
+          example: 400
+          description: "Стоимость месячной подписки в рублях"
+        user_id:
+          type: string
+          format: uuid
+          example: "60601fee-2bf1-4721-a76f-7636e79a0cba"
+          description: ID пользователя
+        start_date:
+          type: string
+          pattern: '^(0[1-9]|1[0-2])-[0-9]{4}$'
+          example: "07-2025"
+          description: Дата начала подписки (месяц и год)
+        end_date:
+          type: string
+          nullable: true
+          pattern: '^(0[1-9]|1[0-2])-[0-9]{4}$'
+          example: "07-2025"
+          description: Дата окончания подписки (опционально)
