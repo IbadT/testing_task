@@ -12,8 +12,8 @@ make dev-up
 # Просмотр логов
 
 make docker-logs
-Приложение будет доступно по адресу: http://localhost:8081
-Swagger документация: http://localhost:8081/swagger/index.html
+Приложение будет доступно по адресу: http://localhost:8080
+Swagger документация: http://localhost:8080/swagger/index.html
 
 3. Остановка
    bash
